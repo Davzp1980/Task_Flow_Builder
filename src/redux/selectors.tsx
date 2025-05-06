@@ -1,3 +1,3 @@
 import { RootState } from './store';
 
-export const selectAllTasks = (state: RootState) => state.tasks.items;
+export const selectAllTasks = (state: RootState): Node[] => state.tasks.items;

@@ -9,7 +9,10 @@ import {
   useEdgesState,
   addEdge,
   Connection,
+  NodeChange,
+  Node as FlowNode,
 } from '@xyflow/react';
+import { Edge } from '@xyflow/react';
 
 import 'reactflow/dist/style.css';
 import '@xyflow/react/dist/style.css';
@@ -23,25 +26,18 @@ import { useDispatch } from 'react-redux';
 import { setAllTasks } from '../../redux/slice.tsx';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { NodeChange } from 'reactflow';
 
-interface NodeData {
-  id: string;
-  data: {
-    label: string;
-  };
-  position: {
-    x: number;
-    y: number;
-  };
-  type: string;
-}
+type MyNodeData = {
+  label: string;
+};
+
+type MyNode = FlowNode<MyNodeData>;
 
 function FlowBuilder() {
   const dispatch = useDispatch();
 
-  const [nodes, setNodes] = useState<CustomNode[]>([]);
-  const [edges, setEdges] = useEdgesState([]);
+  const [nodes, setNodes] = useState<MyNode[]>([]);
+  const [edges, setEdges] = useEdgesState<Edge>([]);
 
   const nodeTypes = useMemo(() => ({ textUpdater: TextUpdaterNode }), []);
 
@@ -57,9 +53,9 @@ function FlowBuilder() {
   } = useForm({ resolver: yupResolver(ValidationSchema) });
 
   const onNodesChange = useCallback(
-    (changes: NodeChange[]) => {
+    (changes: NodeChange<MyNode>[]) => {
       const updated = applyNodeChanges(changes, nodes);
-      setNodes(updated);
+      setNodes(updated); // Обновляем состояние узлов
       dispatch(setAllTasks(updated));
     },
     [nodes, dispatch]
@@ -113,7 +109,7 @@ function FlowBuilder() {
     [nodes, dispatch]
   );
 
-  const handleAddNewNode = (data: any) => {
+  const handleAddNewNode = (data: { node_Name: string }) => {
     AddNewNode(data.node_Name, 'textUpdater');
     reset();
   };

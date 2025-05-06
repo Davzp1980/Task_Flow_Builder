@@ -1,21 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface NodeData {
-  id: string;
-  data: {
-    label: string;
-  };
-  position: {
-    x: number;
-    y: number;
-  };
-  type: string;
-}
-
-interface TasksState {
-  items: NodeData[];
-}
-
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState: {
@@ -23,7 +7,7 @@ const tasksSlice = createSlice({
   },
 
   reducers: {
-    setAllTasks(state, action: PayloadAction<NodeData>) {
+    setAllTasks(state, action: PayloadAction<Node[]>) {
       state.items.push(action.payload);
     },
   },
