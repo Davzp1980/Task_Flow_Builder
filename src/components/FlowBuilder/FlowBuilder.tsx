@@ -60,7 +60,7 @@ function FlowBuilder() {
     (changes: NodeChange[]) => {
       const updated = applyNodeChanges(changes, nodes);
       setNodes(updated);
-      dispatch(setAllTasks(updated:NodeData));
+      dispatch(setAllTasks(updated));
     },
     [nodes, dispatch]
   );
