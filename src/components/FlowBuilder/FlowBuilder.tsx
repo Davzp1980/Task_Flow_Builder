@@ -19,7 +19,7 @@ import {
 import 'reactflow/dist/style.css';
 import '@xyflow/react/dist/style.css';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import TextUpdaterNode from '../TextUpdaterNode/TextUpdaterNode.tsx';
@@ -59,26 +59,6 @@ function FlowBuilder() {
     (params: Connection) => setEdges(eds => addEdge(params, eds)),
     [setEdges]
   );
-
-  useEffect(() => {
-    const handleUpdate = (event: CustomEvent) => {
-      const { id, label } = event.detail;
-      setNodes(nds =>
-        nds.map(node =>
-          node.id === id ? { ...node, data: { ...node.data, label } } : node
-        )
-      );
-    };
-
-    window.addEventListener('update-node-label', handleUpdate as EventListener);
-
-    return () => {
-      window.removeEventListener(
-        'update-node-label',
-        handleUpdate as EventListener
-      );
-    };
-  }, []);
 
   const AddNewNode = useCallback(
     (name: string, type: string) => {
