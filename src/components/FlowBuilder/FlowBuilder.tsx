@@ -8,7 +8,7 @@ import {
   applyNodeChanges,
   useEdgesState,
   addEdge,
-  NodeChange,
+  Connection,
 } from '@xyflow/react';
 
 import 'reactflow/dist/style.css';
@@ -23,6 +23,19 @@ import { useDispatch } from 'react-redux';
 import { setAllTasks } from '../../redux/slice.tsx';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { NodeChange } from 'reactflow';
+
+interface NodeData {
+  id: string;
+  data: {
+    label: string;
+  };
+  position: {
+    x: number;
+    y: number;
+  };
+  type: string;
+}
 
 function FlowBuilder() {
   const dispatch = useDispatch();
@@ -47,19 +60,19 @@ function FlowBuilder() {
     (changes: NodeChange[]) => {
       const updated = applyNodeChanges(changes, nodes);
       setNodes(updated);
-      dispatch(setAllTasks(updated));
+      dispatch(setAllTasks(updated:NodeData));
     },
     [nodes, dispatch]
   );
 
   const onEdgesChange = useCallback(
     (changes: NodeChange[]) => setEdges(eds => applyEdgeChanges(changes, eds)),
-    []
+    [setEdges]
   );
 
   const onConnect = useCallback(
-    params => setEdges(eds => addEdge(params, eds)),
-    []
+    (params: Connection) => setEdges(eds => addEdge(params, eds)),
+    [setEdges]
   );
 
   useEffect(() => {
