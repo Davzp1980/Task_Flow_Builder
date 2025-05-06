@@ -2,17 +2,19 @@ import css from './FlowBuilder.module.css';
 
 import {
   ReactFlow,
-  Controls,
-  Background,
-  applyEdgeChanges,
-  applyNodeChanges,
-  useEdgesState,
   addEdge,
+  applyNodeChanges,
+  applyEdgeChanges,
+  type Node,
+  type Edge,
+  type OnNodesChange,
+  type OnEdgesChange,
+  useEdgesState,
+  EdgeChange,
   Connection,
-  NodeChange,
-  Node as FlowNode,
+  Background,
+  Controls,
 } from '@xyflow/react';
-import { Edge } from '@xyflow/react';
 
 import 'reactflow/dist/style.css';
 import '@xyflow/react/dist/style.css';
@@ -22,21 +24,12 @@ import { v4 as uuidv4 } from 'uuid';
 
 import TextUpdaterNode from '../TextUpdaterNode/TextUpdaterNode.tsx';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
-import { setAllTasks } from '../../redux/slice.tsx';
+
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 
-type MyNodeData = {
-  label: string;
-};
-
-type MyNode = FlowNode<MyNodeData>;
-
 function FlowBuilder() {
-  const dispatch = useDispatch();
-
-  const [nodes, setNodes] = useState<MyNode[]>([]);
+  const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useEdgesState<Edge>([]);
 
   const nodeTypes = useMemo(() => ({ textUpdater: TextUpdaterNode }), []);
@@ -52,17 +45,13 @@ function FlowBuilder() {
     formState: { errors },
   } = useForm({ resolver: yupResolver(ValidationSchema) });
 
-  const onNodesChange = useCallback(
-    (changes: NodeChange<MyNode>[]) => {
-      const updated = applyNodeChanges(changes, nodes);
-      setNodes(updated); // Обновляем состояние узлов
-      dispatch(setAllTasks(updated));
-    },
-    [nodes, dispatch]
+  const onNodesChange: OnNodesChange = useCallback(
+    changes => setNodes(nds => applyNodeChanges(changes, nds)),
+    [setNodes]
   );
 
-  const onEdgesChange = useCallback(
-    (changes: NodeChange[]) => setEdges(eds => applyEdgeChanges(changes, eds)),
+  const onEdgesChange: OnEdgesChange = useCallback(
+    (changes: EdgeChange[]) => setEdges(eds => applyEdgeChanges(changes, eds)),
     [setEdges]
   );
 
@@ -104,9 +93,8 @@ function FlowBuilder() {
 
       const updatedNodes = [...nodes, newNode];
       setNodes(updatedNodes);
-      dispatch(setAllTasks(updatedNodes));
     },
-    [nodes, dispatch]
+    [nodes]
   );
 
   const handleAddNewNode = (data: { node_Name: string }) => {
